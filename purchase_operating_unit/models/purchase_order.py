@@ -90,8 +90,8 @@ class PurchaseOrder(models.Model):
         type_obj = self.env['stock.picking.type']
         if self.operating_unit_id:
             types = type_obj.search([('code', '=', 'incoming'),
-                                     ('warehouse_id.operating_unit_id', '=',
-                                      self.operating_unit_id.id)])
+                            ('warehouse_id.operating_unit_id', 'in',
+                            (self.operating_unit_id.id, False))])
             if types:
                 self.picking_type_id = types[:1]
             else:
