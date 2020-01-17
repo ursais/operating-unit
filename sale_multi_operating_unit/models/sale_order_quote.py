@@ -7,6 +7,7 @@ from odoo.exceptions import UserError
 
 class SaleOrderQuote(models.Model):
     _name = 'sale.order.quote'
+    _description = 'Internal Quote'
 
     name = fields.Char(string='Name')
     operating_unit_id = fields.Many2one(
@@ -39,6 +40,10 @@ class SaleOrderQuote(models.Model):
     ]
 
     notes = fields.Text('Notes')
+
+    expected_date = fields.Date(related='lead_id.date_deadline')
+    assigned_to = fields.Many2one('res.users', related='lead_id.user_id')
+
 
     @api.multi
     @api.constrains('operating_unit_id')
