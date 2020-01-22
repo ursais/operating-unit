@@ -105,6 +105,5 @@ class SaleOrderQuote(models.Model):
             if vals.get('expected_date', False) and soq.lead_id:
                 soq.lead_id.date_deadline = vals.get('expected_date')
             if vals.get('state', False) == 'sent':
-                for soq in self:
-                    soq.generate_crm_lead()
+                soq.generate_crm_lead()
         return res
