@@ -40,7 +40,8 @@ class SaleOrderQuote(models.Model):
     ]
 
     notes = fields.Text('Notes')
-    expected_date = fields.Date(related='lead_id.date_deadline')
+    expected_date = fields.Date(string="Expected Date")
+
     assigned_to = fields.Many2one('res.users', related='lead_id.user_id')
 
     @api.multi
@@ -83,6 +84,7 @@ class SaleOrderQuote(models.Model):
             'description': description,
             'user_id': False,
             'team_id': teams[0].id,
+            'date_deadline': self.expected_date
         }
 
     def generate_crm_lead(self):
@@ -98,6 +100,8 @@ class SaleOrderQuote(models.Model):
     @api.multi
     def write(self, vals):
         res = super().write(vals)
+        if vals.get('expected_date', False and self.lead_id):
+            self.lead_id.date_deadline = vals.get('expected_date')
         if vals.get('state', False) == 'sent':
             for rec in self:
                 rec.generate_crm_lead()
