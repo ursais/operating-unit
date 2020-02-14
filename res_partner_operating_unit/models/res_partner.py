@@ -26,6 +26,5 @@ class ResPartner(models.Model):
     operating_unit_ids = fields.Many2many(
         'operating.unit', 'operating_unit_partner_rel',
         'partner_id', 'operating_unit_id',
-        'Operating Units', default=lambda self: self._default_operating_units(),
-        auto_join=True
+        'Operating Units', default=lambda self: self._default_operating_units()
     )

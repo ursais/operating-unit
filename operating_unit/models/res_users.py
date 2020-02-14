@@ -26,8 +26,7 @@ class ResUsers(models.Model):
 
     operating_unit_ids = fields.Many2many(
         'operating.unit', 'operating_unit_users_rel', 'user_id', 'poid',
-        'Operating Units', default=lambda self: self._default_operating_units(),
-        auto_join=True
+        'Operating Units', default=lambda self: self._default_operating_units()
     )
     default_operating_unit_id = fields.Many2one(
         'operating.unit', 'Default Operating Unit',
