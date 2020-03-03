@@ -34,8 +34,9 @@ class ResPartner(models.Model):
         for partner_id in self:
             if vals.get('operating_unit_ids', False)[0][2]:
                 new_list = partner_id.env.user.partner_allowed_by_ou_ids.ids
-                new_list.append(partner_id.id)
-                partner_id.env.user.partner_allowed_by_ou_ids = [(6, 0,  new_list)]
+                if partner_id.id not in new_list:
+                    new_list.append(partner_id.id)
+                    partner_id.env.user.partner_allowed_by_ou_ids = [(6, 0,  new_list)]
         return super().write(vals)
 
     # Code for Storing Users on Partners

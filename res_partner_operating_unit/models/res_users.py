@@ -49,6 +49,7 @@ class ResUsers(models.Model):
 
     @api.depends('operating_unit_ids')
     def _compute_allowed_partners(self):
+        import pdb; pdb.set_trace()
         cr = self._cr
         for user_id in self:
             if user_id.operating_unit_ids:
