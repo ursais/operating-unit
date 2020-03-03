@@ -28,3 +28,23 @@ class ResPartner(models.Model):
         'partner_id', 'operating_unit_id',
         'Operating Units', default=lambda self: self._default_operating_units()
     )
+
+    @api.depends('operating_unit_ids')
+    def recompute_partners_allowed(self):
+        self.env.user._compute_allowed_partners()
+
+    # Code for Storing Users on Partners
+    # Ran into issue creating Recored Rule this way
+
+    # user_allowed_by_ou_ids = fields.Many2many('res.users', 'user_id_partner_id', 'partner_id', 'user_id', "Allowed users", compute='_compute_allowed_users', store=True)
+
+    # @api.depends('operating_unit_ids')
+    # def _compute_allowed_users(self):
+    #     cr = self._cr
+    #     for partner_id in self:
+    #         if partner_id.operating_unit_ids:
+    #             users = []
+    #             query = """SELECT user_id FROM operating_unit_users_rel WHERE operating_unit_id IN %s""" % partner_id.operating_unit_ids.ids
+    #             cr.execute(query)
+    #             query_results = cr.dictfetchall()
+    #             partner_id.user_allowed_by_ou_ids = query_results.ids
