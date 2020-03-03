@@ -29,15 +29,19 @@ class ResPartner(models.Model):
         'Operating Units', default=lambda self: self._default_operating_units()
     )
 
-    @api.multi
-    def write(self, vals):
-        for partner_id in self:
-            if vals.get('operating_unit_ids', False)[0][2]:
-                new_list = partner_id.env.user.partner_allowed_by_ou_ids.ids
-                if partner_id.id not in new_list:
-                    new_list.append(partner_id.id)
-                    partner_id.env.user.partner_allowed_by_ou_ids = [(6, 0,  new_list)]
-        return super().write(vals)
+    @api.depends('operating_unit_ids')
+    def _recompute_allowed_partners(self):
+        self.env.user.sudo()._compute_allowed_partners()
+
+    # @api.multi
+    # def write(self, vals):
+    #     for partner_id in self:
+    #         if vals.get('operating_unit_ids', False)[0][2]:
+    #             new_list = partner_id.env.user.partner_allowed_by_ou_ids.ids
+    #             if partner_id.id not in new_list:
+    #                 new_list.append(partner_id.id)
+    #                 partner_id.env.user.partner_allowed_by_ou_ids = [(6, 0,  new_list)]
+    #     return super().write(vals)
 
     # Code for Storing Users on Partners
     # Ran into issue creating Recored Rule this way
