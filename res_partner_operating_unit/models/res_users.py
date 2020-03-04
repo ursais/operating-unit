@@ -41,11 +41,11 @@ class ResUsers(models.Model):
 
     partner_allowed_by_ou_ids = fields.\
         Many2many('res.partner',
-                  'partner_id_user_id',
+                  'partner_id_allowed_user_id',
                   'user_id',
                   'partner_id',
                   "Allowed Partners",
-                  compute='_compute_allowed_partners')
+                  default=lambda self: self._compute_allowed_partners())
 
     @api.depends('operating_unit_ids')
     def _compute_allowed_partners(self):
