@@ -15,6 +15,8 @@ class ResUsers(models.Model):
         if vals.get('default_operating_unit_id'):
             res.partner_id.operating_unit_ids = \
                 [(4, res.default_operating_unit_id.id)]
+        if vals.get('operating_unit_ids', False):
+            self._compute_allowed_partners()
         return res
 
     @api.multi
@@ -23,7 +25,10 @@ class ResUsers(models.Model):
             # Add the new OU
             self.partner_id.operating_unit_ids = \
                 [(4, vals.get('default_operating_unit_id'))]
-        return super().write(vals)
+        res = super().write(vals)
+        if vals.get('operating_unit_ids', False):
+            self._compute_allowed_partners()
+        return res
 
     @api.constrains('partner_id.operating_unit_ids',
                     'default_operating_unit_id')
@@ -45,7 +50,7 @@ class ResUsers(models.Model):
                   'user_id',
                   'partner_id',
                   "Allowed Partners",
-                  default=lambda self: self._compute_allowed_partners())
+                  compute='_compute_allowed_partners')
 
     @api.depends('operating_unit_ids')
     def _compute_allowed_partners(self):
@@ -60,3 +65,4 @@ class ResUsers(models.Model):
                 ids = [item for t in query_results for item in t]
                 if query_results:
                     user_id.partner_allowed_by_ou_ids = [(6, 0, ids)]
+        self.env['ir.rule'].clear_caches()
