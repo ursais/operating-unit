@@ -36,14 +36,29 @@ class ResPartner(models.Model):
     @api.multi
     def write(self, vals):
         for partner_id in self:
-            if vals.get('operating_unit_ids', False)[0][2]:
-                new_list = partner_id.env.user.partner_allowed_by_ou_ids.ids
-                if partner_id.id not in new_list:
-                    allowed = self.env.user.partner_allowed_by_ou_ids.ids
-                    allowed.append(partner_id.id)
-                    self.env.user.partner_allowed_by_ou_ids = [(6, 0, allowed)]
-        return super().write(vals)
+            if vals.get('operating_unit_ids', False):
+                vals['flag_pass_ou'] = True
+                # new_list = partner_id.env.user.partner_allowed_by_ou_ids.ids
+                # if partner_id.id not in new_list:
+                #     allowed = self.env.user.partner_allowed_by_ou_ids.ids
+                #     allowed.append(partner_id.id)
+                #     self.env.user.partner_allowed_by_ou_ids = [(6, 0, allowed)]
+        res = super().write(vals)
+        self.env.user._compute_allowed_partners()
+        if self.flag_pass_ou:
+            self.flag_pass_ou = False
+        return res
 
+    flag_pass_ou = fields.Boolean('Flag Pass', default=False)
+
+    @api.model
+    def create(self, vals):
+        if vals.get('operating_unit_ids', False):
+            vals['flag_pass_ou'] = True
+        res = super().create(vals)
+        res.env.user._compute_allowed_partners()
+        res.flag_pass_ou = False
+        return res
     # Code for Storing Users on Partners
     # Ran into issue creating Recored Rule this way
 
