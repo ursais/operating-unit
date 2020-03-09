@@ -11,44 +11,22 @@ class ProductTemplate(models.Model):
         if self.env.context.get('sudo', False):
             records = self.sudo().\
                 search(domain or [], offset=offset, limit=limit, order=order)
-            if not records:
-                return []
-
-            if fields and fields == ['id']:
-                # shortcut read if we only want the ids
-                return [{'id': record.id} for record in records]
-            if 'active_test' in self._context:
-                context = dict(self._context)
-                del context['active_test']
-                records = records.with_context(context)
-
-            result = records.read(fields)
-            if len(result) <= 1:
-                return result
-
-            # reorder read
-            index = {vals['id']: vals for vals in result}
-            return [index[record.id] for
-                    record in records if record.id in index]
         else:
             records = self.\
                 search(domain or [], offset=offset, limit=limit, order=order)
-            if not records:
-                return []
-
-            if fields and fields == ['id']:
-                # shortcut read if we only want the ids
-                return [{'id': record.id} for record in records]
-            if 'active_test' in self._context:
-                context = dict(self._context)
-                del context['active_test']
-                records = records.with_context(context)
-
-            result = records.read(fields)
-            if len(result) <= 1:
-                return result
-
-            # reorder read
-            index = {vals['id']: vals for vals in result}
-            return [index[record.id] for
-                    record in records if record.id in index]
+        if not records:
+            return []
+        if fields and fields == ['id']:
+            # shortcut read if we only want the ids
+            return [{'id': record.id} for record in records]
+        if 'active_test' in self._context:
+            context = dict(self._context)
+            del context['active_test']
+            records = records.with_context(context)
+        result = records.read(fields)
+        if len(result) <= 1:
+            return result
+        # reorder read
+        index = {vals['id']: vals for vals in result}
+        return [index[record.id] for
+                record in records if record.id in index]
