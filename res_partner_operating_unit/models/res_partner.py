@@ -5,7 +5,6 @@ from odoo import api, fields, models
 
 
 class ResPartner(models.Model):
-
     _inherit = 'res.partner'
 
     @api.model
@@ -26,5 +25,16 @@ class ResPartner(models.Model):
     operating_unit_ids = fields.Many2many(
         'operating.unit', 'operating_unit_partner_rel',
         'partner_id', 'operating_unit_id',
-        'Operating Units', default=lambda self: self._default_operating_units()
-    )
+        'Operating Units',
+        default=lambda self: self._default_operating_units())
+
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        args = args + []
+        # Get the OUs of the user
+        ou_ids = self.env.user.operating_unit_ids.ids
+        domain = ['|',
+                  ('operating_unit_ids', 'in', ou_ids),
+                  ('operating_unit_ids', '=', False)]
+        recs = self.search(domain + args, limit=limit)
+        return recs.name_get()
