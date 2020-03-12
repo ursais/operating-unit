@@ -3,8 +3,8 @@
 from odoo import _, api, models
 
 
-class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
 
     @api.model
     def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None):
